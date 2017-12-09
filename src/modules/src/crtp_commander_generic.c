@@ -25,6 +25,7 @@
  */
 #include <stdbool.h>
 #include <string.h>
+#include <stabilizer_types.h>
 
 #include "crtp_commander.h"
 
@@ -67,6 +68,8 @@ enum packet_type {
   cppmEmuType       = 3,
   altHoldType       = 4,
   hoverType         = 5,
+  geometricType     = 6
+
 };
 
 /* ---===== 2 - Decoding functions =====--- */
@@ -91,6 +94,7 @@ struct velocityPacket_s {
   float vz;        // ...
   float yawrate;  // deg/s
 } __attribute__((packed));
+
 static void velocityDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
 {
   const struct velocityPacket_s *values = data;
@@ -237,6 +241,7 @@ struct altHoldPacket_s {
   float yawrate;         // deg/s
   float zVelocity;       // m/s in the world frame of reference
 } __attribute__((packed));
+
 static void altHoldDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
 {
   const struct altHoldPacket_s *values = data;
@@ -270,6 +275,7 @@ struct hoverPacket_s {
   float yawrate;      // deg/s
   float zDistance;    // m in the world frame of reference
 } __attribute__((packed));
+
 static void hoverDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
 {
   const struct hoverPacket_s *values = data;
@@ -292,14 +298,46 @@ static void hoverDecoder(setpoint_t *setpoint, uint8_t type, const void *data, s
   setpoint->velocity_body = true;
 }
 
- /* ---===== 3 - packetDecoders array =====--- */
+/* geometricDecoder
+ * Set the PWM values for each of the motor
+ */
+struct geometricPacket_s {
+    float pwm_m1;
+    float pwm_m2;
+    float pwm_m3;
+    float pwm_m4;
+} __attribute__((packed));
+
+static void geometricDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
+{
+    const struct geometricPacket_s *values = data;
+
+    ASSERT(datalen == sizeof(struct velocityPacket_s));
+
+    setpoint->thrusts.thrust_m1 = values->pwm_m1;
+    setpoint->thrusts.thrust_m2 = values->pwm_m2;
+    setpoint->thrusts.thrust_m3 = values->pwm_m3;
+    setpoint->thrusts.thrust_m4 = values->pwm_m4;
+
+    setpoint->mode.x = modeDisable;
+    setpoint->mode.y = modeDisable;
+    setpoint->mode.z = modeDisable;
+    setpoint->mode.yaw = modeDisable;
+    setpoint->mode.pitch = modeDisable;
+    setpoint->mode.roll = modeDisable;
+    setpoint->velocity_body = false;
+
+}
+
+/* ---===== 3 - packetDecoders array =====--- */
 const static packetDecoder_t packetDecoders[] = {
-  [stopType]          = stopDecoder,
-  [velocityWorldType] = velocityDecoder,
-  [zDistanceType]     = zDistanceDecoder,
-  [cppmEmuType]       = cppmEmuDecoder,
-  [altHoldType]       = altHoldDecoder,
-  [hoverType]         = hoverDecoder,
+        [stopType]          = stopDecoder,
+        [velocityWorldType] = velocityDecoder,
+        [zDistanceType]     = zDistanceDecoder,
+        [cppmEmuType]       = cppmEmuDecoder,
+        [altHoldType]       = altHoldDecoder,
+        [hoverType]         = hoverDecoder,
+        [geometricType]     = geometricDecoder
 };
 
 /* Decoder switch */

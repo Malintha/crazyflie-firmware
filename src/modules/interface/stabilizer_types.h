@@ -43,6 +43,14 @@ typedef struct attitude_s {
   float yaw;
 } attitude_t;
 
+typedef struct thrusts_s {
+    float thrust_m1;
+    float thrust_m2;
+    float thrust_m3;
+    float thrust_m4;
+
+} thrusts_t;
+
 /* x,y,z vector */
 struct vec3_s {
   uint32_t timestamp; // Timestamp when the data was computed
@@ -152,6 +160,7 @@ typedef enum mode_e {
   modeVelocity
 } stab_mode_t;
 
+
 typedef struct setpoint_s {
   uint32_t timestamp;
 
@@ -161,7 +170,7 @@ typedef struct setpoint_s {
   point_t position;
   velocity_t velocity;
   bool velocity_body;
-
+  thrusts_t thrusts;
   struct {
     stab_mode_t x;
     stab_mode_t y;
