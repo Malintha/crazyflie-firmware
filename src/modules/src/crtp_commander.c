@@ -29,11 +29,13 @@
 
 #include "commander.h"
 #include "crtp.h"
-
+#include "log.h"
 
 static bool isInit;
 
 static void commanderCrtpCB(CRTPPacket* pk);
+
+static float m1;
 
 void crtpCommanderInit(void)
 {
@@ -57,6 +59,11 @@ static void commanderCrtpCB(CRTPPacket* pk)
     commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_CRTP);
   } else if (pk->port == CRTP_PORT_SETPOINT_GENERIC && pk->channel == 0) {
     crtpCommanderGenericDecodeSetpoint(&setpoint, pk);
+      m1 = setpoint.m1;
     commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_CRTP);
   }
 }
+
+LOG_GROUP_START(motorValues)
+LOG_ADD(LOG_FLOAT, m1, &m1)
+LOG_GROUP_STOP(motorValues)

@@ -314,10 +314,10 @@ static void geometricDecoder(setpoint_t *setpoint, uint8_t type, const void *dat
 
     ASSERT(datalen == sizeof(struct velocityPacket_s));
 
-    setpoint->thrusts.thrust_m1 = values->pwm_m1;
-    setpoint->thrusts.thrust_m2 = values->pwm_m2;
-    setpoint->thrusts.thrust_m3 = values->pwm_m3;
-    setpoint->thrusts.thrust_m4 = values->pwm_m4;
+    setpoint->m1 = values->pwm_m1;
+    setpoint->m2 = values->pwm_m2;
+    setpoint->m3 = values->pwm_m3;
+    setpoint->m4 = values->pwm_m4;
 
     setpoint->mode.x = modeDisable;
     setpoint->mode.y = modeDisable;

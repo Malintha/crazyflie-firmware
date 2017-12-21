@@ -162,23 +162,26 @@ typedef enum mode_e {
 
 
 typedef struct setpoint_s {
-  uint32_t timestamp;
+    uint32_t timestamp;
 
-  attitude_t attitude;
-  attitude_t attitudeRate;
-  float thrust;
-  point_t position;
-  velocity_t velocity;
-  bool velocity_body;
-  thrusts_t thrusts;
-  struct {
-    stab_mode_t x;
-    stab_mode_t y;
-    stab_mode_t z;
-    stab_mode_t roll;
-    stab_mode_t pitch;
-    stab_mode_t yaw;
-  } mode;
+    attitude_t attitude;
+    attitude_t attitudeRate;
+    float thrust;
+    point_t position;
+    velocity_t velocity;
+    bool velocity_body;
+    float m1;
+    float m2;
+    float m3;
+    float m4;
+    struct {
+        stab_mode_t x;
+        stab_mode_t y;
+        stab_mode_t z;
+        stab_mode_t roll;
+        stab_mode_t pitch;
+        stab_mode_t yaw;
+    } mode;
 } setpoint_t;
 
 /** Estimate of position */
