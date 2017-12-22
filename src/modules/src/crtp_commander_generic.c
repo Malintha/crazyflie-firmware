@@ -26,6 +26,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stabilizer_types.h>
+#include "motors.h"
 
 #include "crtp_commander.h"
 
@@ -67,8 +68,8 @@ enum packet_type {
   zDistanceType     = 2,
   cppmEmuType       = 3,
   altHoldType       = 4,
-  hoverType         = 5,
-  geometricType     = 6
+  hoverType         = 5
+//  geometricType     = 6
 
 };
 
@@ -308,25 +309,22 @@ struct geometricPacket_s {
     float pwm_m4;
 } __attribute__((packed));
 
-static void geometricDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
+static void geometricDecoder(setthrust_t *setthrust, uint8_t type, const void *data, size_t datalen)
 {
     const struct geometricPacket_s *values = data;
 
     ASSERT(datalen == sizeof(struct velocityPacket_s));
 
-    setpoint->m1 = values->pwm_m1;
-    setpoint->m2 = values->pwm_m2;
-    setpoint->m3 = values->pwm_m3;
-    setpoint->m4 = values->pwm_m4;
+    setthrust->m1 = values->pwm_m1;
+    setthrust->m2 = values->pwm_m2;
+    setthrust->m3 = values->pwm_m3;
+    setthrust->m4 = values->pwm_m4;
 
-    setpoint->mode.x = modeDisable;
-    setpoint->mode.y = modeDisable;
-    setpoint->mode.z = modeDisable;
-    setpoint->mode.yaw = modeDisable;
-    setpoint->mode.pitch = modeDisable;
-    setpoint->mode.roll = modeDisable;
-    setpoint->velocity_body = false;
-
+    // short circuit to the motors
+    motorsSetRatio(MOTOR_M1, setthrust->m1);
+    motorsSetRatio(MOTOR_M2, setthrust->m2);
+    motorsSetRatio(MOTOR_M3, setthrust->m3);
+    motorsSetRatio(MOTOR_M4, setthrust->m4);
 }
 
 /* ---===== 3 - packetDecoders array =====--- */
@@ -336,28 +334,32 @@ const static packetDecoder_t packetDecoders[] = {
         [zDistanceType]     = zDistanceDecoder,
         [cppmEmuType]       = cppmEmuDecoder,
         [altHoldType]       = altHoldDecoder,
-        [hoverType]         = hoverDecoder,
-        [geometricType]     = geometricDecoder
+        [hoverType]         = hoverDecoder
+//        [geometricType]     = geometricDecoder
 };
 
 /* Decoder switch */
-void crtpCommanderGenericDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
-{
-  static int nTypes = -1;
+void crtpCommanderGenericDecodeSetpoint(setpoint_t *setpoint, setthrust_t *setthrust, CRTPPacket *pk) {
+    static int nTypes = -1;
 
-  ASSERT(pk->size > 0);
+    ASSERT(pk->size > 0);
 
-  if (nTypes<0) {
-    nTypes = sizeof(packetDecoders)/sizeof(packetDecoders[0]);
-  }
+    if (nTypes < 0) {
+        nTypes = sizeof(packetDecoders) / sizeof(packetDecoders[0]);
+    }
 
-  uint8_t type = pk->data[0];
+    uint8_t type = pk->data[0];
 
-  memset(setpoint, 0, sizeof(setpoint_t));
+    memset(setpoint, 0, sizeof(setpoint_t));
 
-  if (type<nTypes && (packetDecoders[type] != NULL)) {
-    packetDecoders[type](setpoint, type, ((char*)pk->data)+1, pk->size-1);
-  }
+    if (type == 6) {
+        geometricDecoder(setthrust, type, ((char *) pk->data) + 1, pk->size - 1);
+        return;
+    }
+
+    if (type < nTypes && (packetDecoders[type] != NULL)) {
+        packetDecoders[type](setpoint, type, ((char *) pk->data) + 1, pk->size - 1);
+    }
 }
 
 // Params for generic CRTP handlers

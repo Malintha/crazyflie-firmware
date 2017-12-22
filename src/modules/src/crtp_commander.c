@@ -50,18 +50,17 @@ void crtpCommanderInit(void)
 }
 
 
-static void commanderCrtpCB(CRTPPacket* pk)
-{
-  static setpoint_t setpoint;
+static void commanderCrtpCB(CRTPPacket *pk) {
+    static setpoint_t setpoint;
+    static setthrust_t setthrust;
 
-  if(pk->port == CRTP_PORT_SETPOINT && pk->channel == 0) {
-    crtpCommanderRpytDecodeSetpoint(&setpoint, pk);
-    commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_CRTP);
-  } else if (pk->port == CRTP_PORT_SETPOINT_GENERIC && pk->channel == 0) {
-    crtpCommanderGenericDecodeSetpoint(&setpoint, pk);
-      m1 = setpoint.m1;
-    commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_CRTP);
-  }
+    if (pk->port == CRTP_PORT_SETPOINT && pk->channel == 0) {
+        crtpCommanderRpytDecodeSetpoint(&setpoint, pk);
+        commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_CRTP);
+    } else if (pk->port == CRTP_PORT_SETPOINT_GENERIC && pk->channel == 0) {
+        crtpCommanderGenericDecodeSetpoint(&setpoint, &setthrust, pk);
+//        commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_CRTP);
+    }
 }
 
 LOG_GROUP_START(motorValues)

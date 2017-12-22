@@ -160,6 +160,14 @@ typedef enum mode_e {
   modeVelocity
 } stab_mode_t;
 
+typedef struct setthrust_s {
+    uint32_t timestamp;
+    float m1;
+    float m2;
+    float m3;
+    float m4;
+} setthrust_t;
+
 
 typedef struct setpoint_s {
     uint32_t timestamp;
