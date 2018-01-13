@@ -35,6 +35,7 @@
 #include "crtp.h"
 #include "num.h"
 #include "FreeRTOS.h"
+#include "log.h"
 
 /* The generic commander format contains a packet type and data that has to be
  * decoded into a setpoint_t structure. The aim is to make it future-proof
@@ -303,29 +304,28 @@ static void hoverDecoder(setpoint_t *setpoint, uint8_t type, const void *data, s
  * Set the PWM values for each of the motor
  */
 struct geometricPacket_s {
-    float pwm_m1;
-    float pwm_m2;
-    float pwm_m3;
-    float pwm_m4;
+    uint16_t m1;
+    uint16_t m2;
+    uint16_t m3;
+    uint16_t m4;
 } __attribute__((packed));
-
-static void geometricDecoder(setthrust_t *setthrust, uint8_t type, const void *data, size_t datalen)
-{
-    const struct geometricPacket_s *values = data;
-
-    ASSERT(datalen == sizeof(struct velocityPacket_s));
-
-    setthrust->m1 = values->pwm_m1;
-    setthrust->m2 = values->pwm_m2;
-    setthrust->m3 = values->pwm_m3;
-    setthrust->m4 = values->pwm_m4;
-
-    // short circuit to the motors
-    motorsSetRatio(MOTOR_M1, setthrust->m1);
-    motorsSetRatio(MOTOR_M2, setthrust->m2);
-    motorsSetRatio(MOTOR_M3, setthrust->m3);
-    motorsSetRatio(MOTOR_M4, setthrust->m4);
-}
+//static void geometricDecoder(uint8_t type, const void *data, size_t datalen)
+//{
+////    const struct setthrust_s *values = data;
+//
+//    ASSERT(datalen == sizeof(struct velocityPacket_s));
+//
+////    setthrust->m1 = values->m1;
+////    setthrust->m2 = values->m2;
+////    setthrust->m3 = values->m3;
+////    setthrust->m4 = values->m4;
+////
+////    // short circuit to the motors
+////    motorsSetRatio(MOTOR_M1, setthrust->m1);
+////    motorsSetRatio(MOTOR_M2, setthrust->m2);
+////    motorsSetRatio(MOTOR_M3, setthrust->m3);
+////    motorsSetRatio(MOTOR_M4, setthrust->m4);
+//}
 
 /* ---===== 3 - packetDecoders array =====--- */
 const static packetDecoder_t packetDecoders[] = {
@@ -337,32 +337,58 @@ const static packetDecoder_t packetDecoders[] = {
         [hoverType]         = hoverDecoder
 //        [geometricType]     = geometricDecoder
 };
-
+static float m1;
+static float m2;
+static float m3;
+static float m4;
+static float size;
+//static CRTPPacket* pk_log;
 /* Decoder switch */
-void crtpCommanderGenericDecodeSetpoint(setpoint_t *setpoint, setthrust_t *setthrust, CRTPPacket *pk) {
-    static int nTypes = -1;
 
-    ASSERT(pk->size > 0);
+void crtpCommanderGenericDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk) {
+  static int nTypes = -1;
+  ASSERT(pk->size > 0);
+  if (nTypes < 0) {
+    nTypes = sizeof(packetDecoders) / sizeof(packetDecoders[0]);
+  }
 
-    if (nTypes < 0) {
-        nTypes = sizeof(packetDecoders) / sizeof(packetDecoders[0]);
-    }
+//    uint8_t type = pk->data[0];
 
-    uint8_t type = pk->data[0];
+  const void *data1 = ((char *) pk->data);
+  const struct geometricPacket_s *values = data1;
+  size = pk->size;
+  m1 = values->m1;
+  m2 = values->m2;
+  m3 = values->m3;
+  m4 = values->m4;
 
-    memset(setpoint, 0, sizeof(setpoint_t));
+  setpoint->m1 = m1;
+  setpoint->m2 = m2;
+  setpoint->m3 = m3;
+  setpoint->m4 = m4;
 
-    if (type == 6) {
-        geometricDecoder(setthrust, type, ((char *) pk->data) + 1, pk->size - 1);
-        return;
-    }
+//    memset(setpoint, 0, sizeof(setpoint_t));
+//
+//    if (type == 6) {
+//        m1 = 6;
+//        geometricDecoder(type, ((char *) pk->data) + 1, pk->size - 1);
+//        return;
+//    }
 
-    if (type < nTypes && (packetDecoders[type] != NULL)) {
-        packetDecoders[type](setpoint, type, ((char *) pk->data) + 1, pk->size - 1);
-    }
+//    if (type < nTypes && (packetDecoders[type] != NULL)) {
+//        packetDecoders[type](setpoint, type, ((char *) pk->data) + 1, pk->size - 1);
+//    }
 }
 
 // Params for generic CRTP handlers
+
+LOG_GROUP_START(motorValues1)
+LOG_ADD(LOG_FLOAT, m1, &m1)
+LOG_ADD(LOG_FLOAT, m2, &m2)
+LOG_ADD(LOG_FLOAT, m3, &m3)
+LOG_ADD(LOG_FLOAT, m4, &m4)
+LOG_ADD(LOG_FLOAT, size, &size)
+LOG_GROUP_STOP(motorValues1)
 
 // CPPM Emulation commander
 PARAM_GROUP_START(cmdrCPPM)

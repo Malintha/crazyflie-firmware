@@ -73,26 +73,30 @@ void powerStop()
 
 void powerDistribution(control_t *control, setpoint_t *setpoint)
 {
-  #ifdef QUAD_FORMATION_X
-//    int16_t r = control->roll / 2.0f;
-//    int16_t p = control->pitch / 2.0f;
-    motorPower.m1 = limitThrust(setpoint->m1);
-    motorPower.m2 = limitThrust(setpoint->m2);
-    motorPower.m3 =  limitThrust(setpoint->m3);
-    motorPower.m4 =  limitThrust(setpoint->m4);
-  #else // QUAD_FORMATION_NORMAL
-    motorPower.m1 = limitThrust(setpoint->m1);
-    motorPower.m2 = limitThrust(setpoint->m2);
-    motorPower.m3 =  limitThrust(setpoint->m3);
-    motorPower.m4 =  limitThrust(setpoint->m4);
-  #endif
+#ifdef QUAD_FORMATION_X
+    int16_t r = control->roll / 2.0f;
+    int16_t p = control->pitch / 2.0f;
+    motorPower.m1 = limitThrust(control->thrust - r + p + control->yaw);
+    motorPower.m2 = limitThrust(control->thrust - r - p - control->yaw);
+    motorPower.m3 =  limitThrust(control->thrust + r - p + control->yaw);
+    motorPower.m4 =  limitThrust(control->thrust + r + p - control->yaw);
+#else // QUAD_FORMATION_NORMAL
+    motorPower.m1 = limitThrust(control->thrust + control->pitch +
+                                control->yaw);
+    motorPower.m2 = limitThrust(control->thrust - control->roll -
+                                control->yaw);
+    motorPower.m3 =  limitThrust(control->thrust - control->pitch +
+                                 control->yaw);
+    motorPower.m4 =  limitThrust(control->thrust + control->roll -
+                                 control->yaw);
+#endif
 
   if (motorSetEnable)
   {
-    motorsSetRatio(MOTOR_M1, 11000);
-    motorsSetRatio(MOTOR_M2, 11000);
-    motorsSetRatio(MOTOR_M3, 11000);
-    motorsSetRatio(MOTOR_M4, 11000);
+      motorsSetRatio(MOTOR_M1, motorPowerSet.m1);
+      motorsSetRatio(MOTOR_M2, motorPowerSet.m2);
+      motorsSetRatio(MOTOR_M3, motorPowerSet.m3);
+      motorsSetRatio(MOTOR_M4, motorPowerSet.m4);
   }
   else
   {

@@ -43,7 +43,7 @@ typedef struct attitude_s {
   float yaw;
 } attitude_t;
 
-typedef struct thrusts_s {
+struct thrusts_s {
     float thrust_m1;
     float thrust_m2;
     float thrust_m3;
@@ -160,13 +160,13 @@ typedef enum mode_e {
   modeVelocity
 } stab_mode_t;
 
-typedef struct setthrust_s {
-    uint32_t timestamp;
-    float m1;
-    float m2;
-    float m3;
-    float m4;
-} setthrust_t;
+//typedef struct setthrust_s {
+////    uint32_t timestamp;
+//    uint8_t m1;
+//    uint8_t m2;
+//    uint8_t m3;
+//    uint8_t m4;
+//} setthrust_t;
 
 
 typedef struct setpoint_s {
@@ -178,10 +178,10 @@ typedef struct setpoint_s {
     point_t position;
     velocity_t velocity;
     bool velocity_body;
-    float m1;
-    float m2;
-    float m3;
-    float m4;
+    uint16_t m1;
+    uint16_t m2;
+    uint16_t m3;
+    uint16_t m4;
     struct {
         stab_mode_t x;
         stab_mode_t y;

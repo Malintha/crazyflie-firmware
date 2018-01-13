@@ -35,8 +35,6 @@ static bool isInit;
 
 static void commanderCrtpCB(CRTPPacket* pk);
 
-static float m1;
-
 void crtpCommanderInit(void)
 {
   if(isInit) {
@@ -52,17 +50,13 @@ void crtpCommanderInit(void)
 
 static void commanderCrtpCB(CRTPPacket *pk) {
     static setpoint_t setpoint;
-    static setthrust_t setthrust;
+//    static setthrust_t setthrust;
 
     if (pk->port == CRTP_PORT_SETPOINT && pk->channel == 0) {
         crtpCommanderRpytDecodeSetpoint(&setpoint, pk);
         commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_CRTP);
     } else if (pk->port == CRTP_PORT_SETPOINT_GENERIC && pk->channel == 0) {
-        crtpCommanderGenericDecodeSetpoint(&setpoint, &setthrust, pk);
-//        commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_CRTP);
+        crtpCommanderGenericDecodeSetpoint(&setpoint, pk);
+        commanderSetSetpoint(&setpoint, COMMANDER_PRIORITY_DISABLE);
     }
 }
-
-LOG_GROUP_START(motorValues)
-LOG_ADD(LOG_FLOAT, m1, &m1)
-LOG_GROUP_STOP(motorValues)

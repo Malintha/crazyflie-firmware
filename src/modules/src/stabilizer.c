@@ -40,6 +40,7 @@
 #include "sitaw.h"
 #include "controller.h"
 #include "power_distribution.h"
+#include "motors.h"
 
 #include "estimator_kalman.h"
 #include "estimator.h"
@@ -121,28 +122,32 @@ static void stabilizerTask(void* param)
   // Initialize tick to something else then 0
   tick = 1;
 
-  while(1) {
-    vTaskDelayUntil(&lastWakeTime, F2T(RATE_MAIN_LOOP));
+    while (1) {
+        vTaskDelayUntil(&lastWakeTime, F2T(RATE_MAIN_LOOP));
 
-    getExtPosition(&state);
-    stateEstimator(&state, &sensorData, &control, tick);
+        getExtPosition(&state);
+        stateEstimator(&state, &sensorData, &control, tick);
 
-    commanderGetSetpoint(&setpoint, &state);
+        commanderGetSetpoint(&setpoint, &state);
 
-    sitAwUpdateSetpoint(&setpoint, &sensorData, &state);
+        motorsSetRatio(MOTOR_M1,setpoint.m1);
+        motorsSetRatio(MOTOR_M2,setpoint.m2);
+        motorsSetRatio(MOTOR_M3,setpoint.m3);
+        motorsSetRatio(MOTOR_M4,setpoint.m4);
+//    sitAwUpdateSetpoint(&setpoint, &sensorData, &state);
 
-    stateController(&control, &setpoint, &sensorData, &state, tick);
+//    stateController(&control, &setpoint, &sensorData, &state, tick);
 
-    checkEmergencyStopTimeout();
+        checkEmergencyStopTimeout();
 
-    if (emergencyStop) {
-      powerStop();
-    } else {
-        powerDistribution(&control, &setpoint);
+        if (emergencyStop) {
+            powerStop();
+        } else {
+            powerDistribution(&control, &setpoint);
+        }
+
+        tick++;
     }
-
-    tick++;
-  }
 }
 
 void stabilizerSetEmergencyStop()
