@@ -12,13 +12,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8bca5c4c-47a1-4fba-8c50-8a6c50a992ce" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/modules/interface/crtp_commander.h" afterPath="$PROJECT_DIR$/src/modules/interface/crtp_commander.h" />
-      <change beforePath="$PROJECT_DIR$/src/modules/interface/stabilizer_types.h" afterPath="$PROJECT_DIR$/src/modules/interface/stabilizer_types.h" />
-      <change beforePath="$PROJECT_DIR$/src/modules/src/commander.c" afterPath="$PROJECT_DIR$/src/modules/src/commander.c" />
-      <change beforePath="$PROJECT_DIR$/src/modules/src/crtp_commander.c" afterPath="$PROJECT_DIR$/src/modules/src/crtp_commander.c" />
-      <change beforePath="$PROJECT_DIR$/src/modules/src/crtp_commander_generic.c" afterPath="$PROJECT_DIR$/src/modules/src/crtp_commander_generic.c" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/src/modules/src/power_distribution_stock.c" afterPath="$PROJECT_DIR$/src/modules/src/power_distribution_stock.c" />
-      <change beforePath="$PROJECT_DIR$/src/modules/src/stabilizer.c" afterPath="$PROJECT_DIR$/src/modules/src/stabilizer.c" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -46,10 +41,10 @@
       <file leaf-file-name="power_distribution_stock.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/modules/src/power_distribution_stock.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="423">
-              <caret line="82" column="30" lean-forward="true" selection-start-line="82" selection-start-column="30" selection-end-line="82" selection-end-column="30" />
+            <state relative-caret-position="243">
+              <caret line="82" column="30" lean-forward="false" selection-start-line="82" selection-start-column="9" selection-end-line="82" selection-end-column="30" />
               <folding>
-                <element signature="e#1784#2150#0" expanded="true" />
+                <element signature="e#1816#2086#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -351,12 +346,12 @@
       <workItem from="1515684389500" duration="599000" />
       <workItem from="1515693623662" duration="10023000" />
       <workItem from="1515778812845" duration="11312000" />
-      <workItem from="1515863426495" duration="7639000" />
+      <workItem from="1515863426495" duration="7983000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="127770000" />
+    <option name="totallyTimeSpent" value="128114000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="149" y="40" width="1678" height="985" extended-state="0" />
@@ -440,7 +435,7 @@
         <state relative-caret-position="1350">
           <caret line="75" column="25" lean-forward="true" selection-start-line="75" selection-start-column="25" selection-end-line="75" selection-end-column="25" />
           <folding>
-            <element signature="e#1784#2150#0" expanded="true" />
+            <element signature="e#1816#2086#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -774,10 +769,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/modules/src/power_distribution_stock.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="423">
-          <caret line="82" column="30" lean-forward="true" selection-start-line="82" selection-start-column="30" selection-end-line="82" selection-end-column="30" />
+        <state relative-caret-position="243">
+          <caret line="82" column="30" lean-forward="false" selection-start-line="82" selection-start-column="9" selection-end-line="82" selection-end-column="30" />
           <folding>
-            <element signature="e#1784#2150#0" expanded="true" />
+            <element signature="e#1816#2086#0" expanded="true" />
           </folding>
         </state>
       </provider>

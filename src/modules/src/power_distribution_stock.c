@@ -34,90 +34,86 @@
 static bool motorSetEnable = false;
 
 static struct {
-  uint32_t m1;
-  uint32_t m2;
-  uint32_t m3;
-  uint32_t m4;
+    uint32_t m1;
+    uint32_t m2;
+    uint32_t m3;
+    uint32_t m4;
 } motorPower;
 
 static struct {
-  uint16_t m1;
-  uint16_t m2;
-  uint16_t m3;
-  uint16_t m4;
+    uint16_t m1;
+    uint16_t m2;
+    uint16_t m3;
+    uint16_t m4;
 } motorPowerSet;
 
 void powerDistributionInit(void)
 {
-  motorsInit(motorMapDefaultBrushed);
+    motorsInit(motorMapDefaultBrushed);
 }
 
 bool powerDistributionTest(void)
 {
-  bool pass = true;
+    bool pass = true;
 
-  pass &= motorsTest();
+    pass &= motorsTest();
 
-  return pass;
+    return pass;
 }
 
 #define limitThrust(VAL) limitUint16(VAL)
 
 void powerStop()
 {
-  motorsSetRatio(MOTOR_M1, 0);
-  motorsSetRatio(MOTOR_M2, 0);
-  motorsSetRatio(MOTOR_M3, 0);
-  motorsSetRatio(MOTOR_M4, 0);
+    motorsSetRatio(MOTOR_M1, 0);
+    motorsSetRatio(MOTOR_M2, 0);
+    motorsSetRatio(MOTOR_M3, 0);
+    motorsSetRatio(MOTOR_M4, 0);
 }
 
 void powerDistribution(control_t *control, setpoint_t *setpoint)
 {
 #ifdef QUAD_FORMATION_X
-    int16_t r = control->roll / 2.0f;
-    int16_t p = control->pitch / 2.0f;
-    motorPower.m1 = limitThrust(control->thrust - r + p + control->yaw);
-    motorPower.m2 = limitThrust(control->thrust - r - p - control->yaw);
-    motorPower.m3 =  limitThrust(control->thrust + r - p + control->yaw);
-    motorPower.m4 =  limitThrust(control->thrust + r + p - control->yaw);
+    //    int16_t r = control->roll / 2.0f;
+//    int16_t p = control->pitch / 2.0f;
+    motorPower.m1 = limitThrust(setpoint->m1);
+    motorPower.m2 = limitThrust(setpoint->m2);
+    motorPower.m3 =  limitThrust(setpoint->m3);
+    motorPower.m4 =  limitThrust(setpoint->m4);
 #else // QUAD_FORMATION_NORMAL
-    motorPower.m1 = limitThrust(control->thrust + control->pitch +
-                                control->yaw);
-    motorPower.m2 = limitThrust(control->thrust - control->roll -
-                                control->yaw);
-    motorPower.m3 =  limitThrust(control->thrust - control->pitch +
-                                 control->yaw);
-    motorPower.m4 =  limitThrust(control->thrust + control->roll -
-                                 control->yaw);
+    motorPower.m1 = limitThrust(setpoint->m1);
+    motorPower.m2 = limitThrust(setpoint->m2);
+    motorPower.m3 =  limitThrust(setpoint->m3);
+    motorPower.m4 =  limitThrust(setpoint->m4);
 #endif
 
-  if (motorSetEnable)
-  {
-      motorsSetRatio(MOTOR_M1, motorPowerSet.m1);
-      motorsSetRatio(MOTOR_M2, motorPowerSet.m2);
-      motorsSetRatio(MOTOR_M3, motorPowerSet.m3);
-      motorsSetRatio(MOTOR_M4, motorPowerSet.m4);
-  }
-  else
-  {
-    motorsSetRatio(MOTOR_M1, motorPower.m1);
-    motorsSetRatio(MOTOR_M2, motorPower.m2);
-    motorsSetRatio(MOTOR_M3, motorPower.m3);
-    motorsSetRatio(MOTOR_M4, motorPower.m4);
-  }
+    if (motorSetEnable)
+    {
+        motorsSetRatio(MOTOR_M1, 0);
+        motorsSetRatio(MOTOR_M2, 0);
+        motorsSetRatio(MOTOR_M3, 0);
+        motorsSetRatio(MOTOR_M4, 0);
+    }
+    else
+    {
+        motorsSetRatio(MOTOR_M1, motorPower.m1);
+        motorsSetRatio(MOTOR_M2, motorPower.m2);
+        motorsSetRatio(MOTOR_M3, motorPower.m3);
+        motorsSetRatio(MOTOR_M4, motorPower.m4);
+    }
 }
 
 PARAM_GROUP_START(motorPowerSet)
-PARAM_ADD(PARAM_UINT8, enable, &motorSetEnable)
-PARAM_ADD(PARAM_UINT16, m1, &motorPowerSet.m1)
-PARAM_ADD(PARAM_UINT16, m2, &motorPowerSet.m2)
-PARAM_ADD(PARAM_UINT16, m3, &motorPowerSet.m3)
-PARAM_ADD(PARAM_UINT16, m4, &motorPowerSet.m4)
+                PARAM_ADD(PARAM_UINT8, enable, &motorSetEnable)
+                PARAM_ADD(PARAM_UINT16, m1, &motorPowerSet.m1)
+                PARAM_ADD(PARAM_UINT16, m2, &motorPowerSet.m2)
+                PARAM_ADD(PARAM_UINT16, m3, &motorPowerSet.m3)
+                PARAM_ADD(PARAM_UINT16, m4, &motorPowerSet.m4)
 PARAM_GROUP_STOP(ring)
 
 LOG_GROUP_START(motor)
-LOG_ADD(LOG_INT32, m4, &motorPower.m4)
-LOG_ADD(LOG_INT32, m1, &motorPower.m1)
-LOG_ADD(LOG_INT32, m2, &motorPower.m2)
-LOG_ADD(LOG_INT32, m3, &motorPower.m3)
+                LOG_ADD(LOG_INT32, m4, &motorPower.m4)
+                LOG_ADD(LOG_INT32, m1, &motorPower.m1)
+                LOG_ADD(LOG_INT32, m2, &motorPower.m2)
+                LOG_ADD(LOG_INT32, m3, &motorPower.m3)
 LOG_GROUP_STOP(motor)
